@@ -9,16 +9,13 @@
     </string-array>
 
     <string-array name="extension_select">
-        <item>.mp3</item>
         <item>.m4a</item>
         <item>.aac</item>
     </string-array>
 
     <string-array name="bitrate_select">
-        <item>8</item>
         <item>16</item>
         <item>32</item>
-        <item>64</item>
-        <item>96</item>
+        <item>48</item>
     </string-array>
 </resources>
