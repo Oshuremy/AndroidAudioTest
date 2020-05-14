@@ -6,6 +6,7 @@ import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.MediaRecorder
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity(),
 
     // Requesting permission to RECORD_AUDIO
     private var recordPermission: String = Manifest.permission.RECORD_AUDIO
+    private var readStoragePermission: String = Manifest.permission.READ_EXTERNAL_STORAGE
 
     private var isRecording: Boolean = false
     private var isPlaying: Boolean = false
@@ -60,6 +62,9 @@ class MainActivity : AppCompatActivity(),
         setSpinners()
         initSpinnersListener()
         setRecyclerView()
+
+        checkReadStoragePermissions()
+
 
         record_button.setOnTouchListener { _, event ->
             if (checkPermissions()) {
@@ -80,6 +85,14 @@ class MainActivity : AppCompatActivity(),
             }
 
             true
+        }
+    }
+
+    private fun checkReadStoragePermissions() {
+        if (ActivityCompat.checkSelfPermission(this, readStoragePermission) == PackageManager.PERMISSION_GRANTED)
+            return
+        else {
+            ActivityCompat.requestPermissions(this, arrayOf(readStoragePermission), REQUEST_RECORD_AUDIO_PERMISSION)
         }
     }
 
@@ -193,36 +206,18 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun playAudio(file: File?, imageView: ImageView) {
-        mediaPlayer = MediaPlayer()
+        mediaPlayer = MediaPlayer.create(this, Uri.parse(file?.absolutePath))
 
-        Log.d("Test", file!!.absolutePath)
+        Log.d("AlexTest", "${file!!.canRead()} ${file.exists()}")
 
-        mediaPlayer?.apply {
-            /*setAudioAttributes(AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .setLegacyStreamType(AudioManager.STREAM_MUSIC)
-                .build())*/
-
-            try {
-                setOnPreparedListener {
-                    MediaPlayer.OnPreparedListener { mediaPlayer?.start() }
-                }
-                setDataSource(file.path)
-                prepare()
-            } catch (e: IOException) {
-                Log.e("Test", "prepare() failed $e")
-            }
-
-            start()
-        }
+        mediaPlayer?.start()
 
 
         imageView.setImageDrawable(resources.getDrawable(R.drawable.list_pause_btn))
 
         isPlaying = true
 
-        mediaPlayer?.setOnCompletionListener {
+        /*mediaPlayer?.setOnCompletionListener {
             MediaPlayer.OnCompletionListener {
                 it?.apply {
                     stop()
@@ -235,7 +230,7 @@ class MainActivity : AppCompatActivity(),
                 mediaPlayer = null
             }
 
-        }
+        }*/
     }
 
     private fun stopAudio(imageView: ImageView) {
