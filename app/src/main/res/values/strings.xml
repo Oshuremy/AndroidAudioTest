@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">AudioTest</string>
+    <string name="sample">record_title.3gp</string>
+
+    <string-array name="encoder_select">
+        <item>AAC</item>
+        <item>ELD AAC</item>
+        <item>HE AAC</item>
+    </string-array>
+
+    <string-array name="extension_select">
+        <item>.m4a</item>
+        <item>.aac</item>
+    </string-array>
+
+    <string-array name="bitrate_select">
+        <item>16</item>
+        <item>32</item>
+        <item>48</item>
+    </string-array>
 </resources>
