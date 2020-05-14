@@ -195,7 +195,7 @@ class MainActivity : AppCompatActivity(),
     private fun playAudio(file: File?, imageView: ImageView) {
         mediaPlayer = MediaPlayer()
 
-        Log.d("AlexTest", file!!.absolutePath)
+        Log.d("Test", file!!.absolutePath)
 
         mediaPlayer?.apply {
             /*setAudioAttributes(AudioAttributes.Builder()
@@ -211,7 +211,7 @@ class MainActivity : AppCompatActivity(),
                 setDataSource(file.path)
                 prepare()
             } catch (e: IOException) {
-                Log.e("AlexTest", "prepare() failed $e")
+                Log.e("Test", "prepare() failed $e")
             }
 
             start()
