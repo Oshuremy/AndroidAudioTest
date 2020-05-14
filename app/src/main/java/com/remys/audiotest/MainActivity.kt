@@ -2,12 +2,9 @@ package com.remys.audiotest
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.media.AudioAttributes
-import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
@@ -57,14 +54,13 @@ class MainActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        path = this.getExternalFilesDir("/")?.absolutePath
+        path = getExternalFilesDir("/")?.absolutePath
 
         setSpinners()
         initSpinnersListener()
         setRecyclerView()
 
         checkReadStoragePermissions()
-
 
         record_button.setOnTouchListener { _, event ->
             if (checkPermissions()) {
@@ -85,6 +81,9 @@ class MainActivity : AppCompatActivity(),
             }
 
             true
+        }
+        play_audio_url.setOnClickListener {
+            playAudioUrl()
         }
     }
 
@@ -181,8 +180,7 @@ class MainActivity : AppCompatActivity(),
 
         extension_selector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                extensionValue = SpinnerHelper.getSpinnerSelectedValue(applicationContext, EXTENSION_SELECTOR,
-                    position)
+                extensionValue = SpinnerHelper.getSpinnerSelectedValue(applicationContext, EXTENSION_SELECTOR, position)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -206,15 +204,45 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun playAudio(file: File?, imageView: ImageView) {
-        mediaPlayer = MediaPlayer.create(this, Uri.parse(file?.absolutePath))
+        Log.d("#test", "path: ${file?.absolutePath}")
+        Log.d("#test", "Uri.FromFile: ${Uri.fromFile(file)}")
 
-        Log.d("AlexTest", "${file!!.canRead()} ${file.exists()}")
+        Log.d("#test", "canRead: ${file?.canRead()} | exist: ${file?.exists()}")
 
-        mediaPlayer?.start()
+        mediaPlayer = MediaPlayer.create(this, Uri.fromFile(file))
 
+        mediaPlayer?.apply {
+            try {
+                // prepare()
+                start()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+
+        // val player = MediaPlayer();
+        // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        //     player.setAudioAttributes(AudioAttributes.Builder()
+        //         .setUsage(AudioAttributes.USAGE_MEDIA)
+        //         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+        //         .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+        //         .build());
+        // } else {
+        //     player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        // }
+        // try {
+        //     player.setDataSource(this, Uri.fromFile(file))
+        //     // player.prepareAsync();
+        //     player.prepare();
+        //     player.start();
+        //     // player.setOnPreparedListener {
+        //     //     player.start()
+        //     // }
+        // } catch (e: Exception) {
+        //     e.printStackTrace()
+        // }
 
         imageView.setImageDrawable(resources.getDrawable(R.drawable.list_pause_btn))
-
         isPlaying = true
 
         /*mediaPlayer?.setOnCompletionListener {
@@ -243,10 +271,25 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun playAudioFile(file: File?, imageView: ImageView) {
-        if (!isPlaying) {
+        if (!isPlaying)
             playAudio(file, imageView)
-        } else {
+        else
             stopAudio(imageView)
+    }
+
+    private fun playAudioUrl() {
+        val url =
+            "https://cdn.fbsbx.com/v/t59.3654-21/97884637_254134322452318_3856315336802435072_n.mp4/audioclip-1589449208-6443.mp4?_nc_cat=102&_nc_sid=7272a8&_nc_ohc=5D6mZdlt9fEAX802MS3&_nc_ht=cdn.fbsbx.com&oh=24fce8c520b061af1face8677d032be6&oe=5EBEC301&dl=1"
+
+        // val mp = MediaPlayer.create(this, R.raw.sound_push)
+        val mp = MediaPlayer.create(this, Uri.parse(url))
+        // val mp = MediaPlayer()
+        try {
+            // mp.setDataSource(url)
+            // mp.prepare()
+            mp.start()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
     }
 

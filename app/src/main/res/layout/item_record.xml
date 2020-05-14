@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    android:layout_marginTop="0dp">
+    android:layout_marginTop="0dp"
+    android:orientation="horizontal">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -24,18 +24,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/colorWhite"
-                android:text="@string/sample"/>
+                android:text="@string/sample"
+                android:textColor="@color/colorWhite" />
 
             <ImageView
                 android:id="@+id/play_button"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                app:srcCompat="@drawable/list_play_btn"/>
+                app:srcCompat="@drawable/list_play_btn" />
         </LinearLayout>
-
-
     </androidx.cardview.widget.CardView>
-
-
 </LinearLayout>

@@ -10,12 +10,10 @@
         android:id="@+id/imageView"
         android:layout_width="220dp"
         android:layout_height="220dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.031"
         app:srcCompat="@drawable/home_illustration" />
 
     <LinearLayout
@@ -30,64 +28,66 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="2dp"
             android:background="#EDEBEB"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="2dp">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
                 android:text="BitRate"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
             <Spinner
                 android:id="@+id/bitrate_selector"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:entries="@array/bitrate_select"/>
+                android:entries="@array/bitrate_select" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="2dp"
             android:background="#EDEBEB"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="2dp">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
                 android:text="Encoder"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
             <Spinner
                 android:id="@+id/encoder_selector"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:entries="@array/encoder_select"/>
+                android:entries="@array/encoder_select" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="2dp"
-            android:paddingRight="0dp"
             android:background="#EDEBEB"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="2dp"
+            android:paddingRight="0dp">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
                 android:text="Extension"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
             <Spinner
                 android:id="@+id/extension_selector"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:entries="@array/extension_select"/>
+                android:entries="@array/extension_select" />
         </LinearLayout>
-
     </LinearLayout>
 
     <TextView
@@ -118,11 +118,21 @@
         app:layout_constraintTop_toBottomOf="@+id/timer"
         app:srcCompat="@drawable/record_btn_recording" />
 
+    <ImageView
+        android:id="@+id/play_audio_url"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        app:layout_constraintBottom_toBottomOf="@+id/record_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/record_button"
+        app:layout_constraintTop_toTopOf="@+id/record_button"
+        app:srcCompat="@drawable/list_play_btn" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="128dp"
+        android:layout_marginTop="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -130,5 +140,4 @@
         app:layout_constraintTop_toBottomOf="@+id/record_button"
         app:layout_constraintVertical_bias="0.533"
         tools:listitem="@layout/item_record" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
