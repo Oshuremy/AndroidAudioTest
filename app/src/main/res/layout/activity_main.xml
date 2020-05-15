@@ -18,7 +18,7 @@
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="@+id/imageView"
@@ -47,8 +47,9 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:background="#EDEBEB"
             android:orientation="vertical"
             android:padding="2dp">
@@ -57,36 +58,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
-                android:text="Encoder"
+                android:text="CodecFormat"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
             <Spinner
-                android:id="@+id/encoder_selector"
+                android:id="@+id/codecformat_selector"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:entries="@array/encoder_select" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="#EDEBEB"
-            android:orientation="vertical"
-            android:padding="2dp"
-            android:paddingRight="0dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:text="Extension"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-            <Spinner
-                android:id="@+id/extension_selector"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:entries="@array/extension_select" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </LinearLayout>
 
@@ -118,15 +96,27 @@
         app:layout_constraintTop_toBottomOf="@+id/timer"
         app:srcCompat="@drawable/record_btn_recording" />
 
-    <ImageView
-        android:id="@+id/play_audio_url"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="@+id/record_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/record_button"
-        app:layout_constraintTop_toTopOf="@+id/record_button"
-        app:srcCompat="@drawable/list_play_btn" />
+        app:layout_constraintTop_toTopOf="@+id/record_button">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="fromUrl" />
+
+        <ImageView
+            android:id="@+id/play_audio_url"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:srcCompat="@drawable/list_play_btn" />
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"

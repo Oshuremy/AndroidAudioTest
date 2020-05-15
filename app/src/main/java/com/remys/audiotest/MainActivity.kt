@@ -4,10 +4,11 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.media.MediaRecorder
+import android.media.MediaRecorder.AudioEncoder
+import android.media.MediaRecorder.OutputFormat
 import android.net.Uri
 import android.os.Bundle
 import android.os.SystemClock
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.AdapterView
@@ -16,10 +17,6 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.remys.audiotest.SpinnerHelper.BITRATE_SELECTOR
-import com.remys.audiotest.SpinnerHelper.ENCODER_SELECTOR
-import com.remys.audiotest.SpinnerHelper.EXTENSION_SELECTOR
-import com.remys.audiotest.SpinnerHelper.getAudioEncoder
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.IOException
@@ -32,8 +29,6 @@ private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
 class MainActivity : AppCompatActivity(),
     OnAudioFileListener {
     private var bitrateValue: Int = 0
-    private lateinit var encoderValue: String
-    private lateinit var extensionValue: String
 
     private var mediaRecorder: MediaRecorder? = null
     private var mediaPlayer: MediaPlayer? = null
@@ -49,6 +44,31 @@ class MainActivity : AppCompatActivity(),
     private var allFiles: ArrayList<File>? = null
 
     private var playlistAdapter: PlaylistAdapter? = null
+
+    private lateinit var codecFormatSelected: CodecFormat
+    private val codecFormatList = arrayOf(
+        // .aac
+        CodecFormat(AudioEncoder.AAC, OutputFormat.AAC_ADTS, ".aac", "AAC|AAC_ADTS|aac"),
+        // CodecFormat(AudioEncoder.HE_AAC, OutputFormat.AAC_ADTS, ".aac", "HE_AAC|AAC_ADTS|aac"),
+        CodecFormat(AudioEncoder.AAC_ELD, OutputFormat.AAC_ADTS, ".aac", "AAC_ELD|AAC_ADTS|aac"),
+
+        // .mpa
+        // CodecFormat(AudioEncoder.AAC, OutputFormat.AAC_ADTS, ".m4a", "AAC|AAC_ADTS|m4a"),
+        // CodecFormat(AudioEncoder.HE_AAC, OutputFormat.AAC_ADTS, ".m4a", "HE_AAC|AAC_ADTS|m4a"),
+        // CodecFormat(AudioEncoder.AAC_ELD, OutputFormat.AAC_ADTS, ".m4a", "AAC_ELD|AAC_ADTS|m4a"),
+
+        // .mp4
+        CodecFormat(AudioEncoder.AAC_ELD, OutputFormat.AAC_ADTS, ".mp4", "AAC_ELD|AAC_ADTS|mp4"),
+
+        // mp3
+        CodecFormat(AudioEncoder.AAC, OutputFormat.MPEG_4, ".mp3", "AAC|MPEG_4|mp3"),
+
+        // OPUS .ogg/.webm
+        CodecFormat(AudioEncoder.OPUS, OutputFormat.OGG, ".ogg", "OPUS|OGG|ogg"),
+        CodecFormat(AudioEncoder.OPUS, OutputFormat.WEBM, ".webm", "OPUS|WEBM|webm")
+        // CodecFormat(AudioEncoder.VORBIS, OutputFormat.OGG, ".ogg", "VORBIS|OGG|ogg"),
+        // CodecFormat(AudioEncoder.VORBIS, OutputFormat.WEBM, ".webm", "VORBIS|WEBM|webm")
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,8 +110,16 @@ class MainActivity : AppCompatActivity(),
     private fun checkReadStoragePermissions() {
         if (ActivityCompat.checkSelfPermission(this, readStoragePermission) == PackageManager.PERMISSION_GRANTED)
             return
-        else {
+        else
             ActivityCompat.requestPermissions(this, arrayOf(readStoragePermission), REQUEST_RECORD_AUDIO_PERMISSION)
+    }
+
+    private fun checkPermissions(): Boolean {
+        return if (ActivityCompat.checkSelfPermission(this, recordPermission) == PackageManager.PERMISSION_GRANTED)
+            true
+        else {
+            ActivityCompat.requestPermissions(this, arrayOf(recordPermission), REQUEST_RECORD_AUDIO_PERMISSION)
+            false
         }
     }
 
@@ -99,16 +127,18 @@ class MainActivity : AppCompatActivity(),
         timer.base = SystemClock.elapsedRealtime()
         timer.start()
 
-        val formatter = SimpleDateFormat("dd:HH:mm:ss", Locale.FRANCE)
-        val recordFile = "${bitrateValue}_${encoderValue}_${formatter.format(Date())}$extensionValue"
+        val formatter = SimpleDateFormat("ddHHmmss", Locale.FRANCE)
+        val recordFile =
+            "${formatter.format(Date())}-${bitrateValue}-" +
+                "${codecFormatSelected.toString}${codecFormatSelected.extension}"
 
         mediaRecorder = MediaRecorder()
         mediaRecorder?.apply {
             this.setAudioSource(MediaRecorder.AudioSource.MIC)
-            this.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
+            this.setOutputFormat(codecFormatSelected.outputFormat)
             this.setOutputFile("$path/$recordFile")
-            this.setAudioEncoder(getAudioEncoder(encoderValue))
-            this.setAudioEncodingBitRate(bitrateValue)
+            this.setAudioEncoder(codecFormatSelected.codec)
+            // this.setAudioEncodingBitRate(bitrateValue)
 
             try {
                 this.prepare()
@@ -136,55 +166,35 @@ class MainActivity : AppCompatActivity(),
         setRecyclerView()
     }
 
-    private fun checkPermissions(): Boolean {
-        return if (ActivityCompat.checkSelfPermission(this, recordPermission) == PackageManager.PERMISSION_GRANTED)
-            true
-        else {
-            ActivityCompat.requestPermissions(this, arrayOf(recordPermission), REQUEST_RECORD_AUDIO_PERMISSION)
-            false
-        }
-    }
-
     private fun setSpinners() {
         val bitrateSelection = this.resources.getStringArray(R.array.bitrate_select)
         bitrate_selector.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, bitrateSelection)
 
-        val encoderSelection = this.resources.getStringArray(R.array.encoder_select)
-        encoder_selector.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, encoderSelection)
+        val codecFormatStrings: ArrayList<String> = arrayListOf()
+        for (codecFormat in codecFormatList)
+            codecFormatStrings.add(codecFormat.toString())
 
-        val extensionSelection = this.resources.getStringArray(R.array.extension_select)
-        extension_selector.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, extensionSelection)
+        codecformat_selector.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, codecFormatStrings)
     }
 
     private fun initSpinnersListener() {
         bitrate_selector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                bitrateValue =
-                    SpinnerHelper.getSpinnerSelectedValue(applicationContext, BITRATE_SELECTOR, position).toInt()
+                bitrateValue = resources.getStringArray(R.array.bitrate_select)[position].toInt()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                bitrateValue = SpinnerHelper.getSpinnerSelectedValue(applicationContext, BITRATE_SELECTOR, 0).toInt()
+                bitrateValue = resources.getStringArray(R.array.bitrate_select)[0].toInt()
             }
         }
 
-        encoder_selector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        codecformat_selector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                encoderValue = SpinnerHelper.getSpinnerSelectedValue(applicationContext, ENCODER_SELECTOR, position)
+                codecFormatSelected = codecFormatList[position]
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                encoderValue = SpinnerHelper.getSpinnerSelectedValue(applicationContext, ENCODER_SELECTOR, 0)
-            }
-        }
-
-        extension_selector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                extensionValue = SpinnerHelper.getSpinnerSelectedValue(applicationContext, EXTENSION_SELECTOR, position)
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                extensionValue = SpinnerHelper.getSpinnerSelectedValue(applicationContext, EXTENSION_SELECTOR, 0)
+                codecFormatSelected = codecFormatList[0]
             }
         }
     }
@@ -204,61 +214,29 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun playAudio(file: File?, imageView: ImageView) {
-        Log.d("#test", "path: ${file?.absolutePath}")
-        Log.d("#test", "Uri.FromFile: ${Uri.fromFile(file)}")
-
-        Log.d("#test", "canRead: ${file?.canRead()} | exist: ${file?.exists()}")
-
         mediaPlayer = MediaPlayer.create(this, Uri.fromFile(file))
 
         mediaPlayer?.apply {
             try {
-                // prepare()
                 start()
             } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
 
-        // val player = MediaPlayer();
-        // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        //     player.setAudioAttributes(AudioAttributes.Builder()
-        //         .setUsage(AudioAttributes.USAGE_MEDIA)
-        //         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-        //         .setLegacyStreamType(AudioManager.STREAM_MUSIC)
-        //         .build());
-        // } else {
-        //     player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        // }
-        // try {
-        //     player.setDataSource(this, Uri.fromFile(file))
-        //     // player.prepareAsync();
-        //     player.prepare();
-        //     player.start();
-        //     // player.setOnPreparedListener {
-        //     //     player.start()
-        //     // }
-        // } catch (e: Exception) {
-        //     e.printStackTrace()
-        // }
-
         imageView.setImageDrawable(resources.getDrawable(R.drawable.list_pause_btn))
         isPlaying = true
 
-        /*mediaPlayer?.setOnCompletionListener {
-            MediaPlayer.OnCompletionListener {
-                it?.apply {
-                    stop()
-                    release()
-
-                }
-
-                imageView.setImageDrawable(resources.getDrawable(R.drawable.list_play_btn))
-                isPlaying = false
-                mediaPlayer = null
+        mediaPlayer?.setOnCompletionListener {
+            it?.apply {
+                stop()
+                release()
             }
 
-        }*/
+            imageView.setImageDrawable(resources.getDrawable(R.drawable.list_play_btn))
+            isPlaying = false
+            mediaPlayer = null
+        }
     }
 
     private fun stopAudio(imageView: ImageView) {
@@ -268,13 +246,6 @@ class MainActivity : AppCompatActivity(),
 
         imageView.setImageDrawable(resources.getDrawable(R.drawable.list_play_btn))
         isPlaying = false
-    }
-
-    override fun playAudioFile(file: File?, imageView: ImageView) {
-        if (!isPlaying)
-            playAudio(file, imageView)
-        else
-            stopAudio(imageView)
     }
 
     private fun playAudioUrl() {
@@ -291,6 +262,13 @@ class MainActivity : AppCompatActivity(),
         } catch (e: IOException) {
             e.printStackTrace()
         }
+    }
+
+    override fun playAudioFile(file: File?, imageView: ImageView) {
+        if (!isPlaying)
+            playAudio(file, imageView)
+        else
+            stopAudio(imageView)
     }
 
     override fun getAudioFileDetail(position: Int) {
