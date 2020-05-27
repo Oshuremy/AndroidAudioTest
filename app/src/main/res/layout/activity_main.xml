@@ -20,52 +20,22 @@
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="@+id/imageView"
-        app:layout_constraintStart_toStartOf="@+id/imageView"
+        android:background="#EDEBEB"
+        android:orientation="vertical"
+        android:padding="2dp"
         app:layout_constraintTop_toBottomOf="@+id/imageView">
 
-        <LinearLayout
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#EDEBEB"
-            android:orientation="vertical"
-            android:padding="2dp">
+            android:layout_marginBottom="2dp"
+            android:text="CodecFormat"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:text="BitRate"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-            <Spinner
-                android:id="@+id/bitrate_selector"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:entries="@array/bitrate_select" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="#EDEBEB"
-            android:orientation="vertical"
-            android:padding="2dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:text="CodecFormat"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-            <Spinner
-                android:id="@+id/codecformat_selector"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
+        <Spinner
+            android:id="@+id/codecformat_selector"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <TextView

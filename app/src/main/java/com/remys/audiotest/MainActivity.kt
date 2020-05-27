@@ -28,8 +28,6 @@ private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
 
 class MainActivity : AppCompatActivity(),
     OnAudioFileListener {
-    private var bitrateValue: Int = 0
-
     private var mediaRecorder: MediaRecorder? = null
     private var mediaPlayer: MediaPlayer? = null
 
@@ -48,9 +46,11 @@ class MainActivity : AppCompatActivity(),
     private lateinit var codecFormatSelected: CodecFormat
     private val codecFormatList = arrayOf(
         // .aac
-        CodecFormat(AudioEncoder.AAC, OutputFormat.AAC_ADTS, ".aac", "AAC|AAC_ADTS|aac"),
+        // CodecFormat(AudioEncoder.AAC, OutputFormat.AAC_ADTS, ".aac", "AAC|AAC_ADTS|aac"),
         // CodecFormat(AudioEncoder.HE_AAC, OutputFormat.AAC_ADTS, ".aac", "HE_AAC|AAC_ADTS|aac"),
-        CodecFormat(AudioEncoder.AAC_ELD, OutputFormat.AAC_ADTS, ".aac", "AAC_ELD|AAC_ADTS|aac"),
+        // CodecFormat(AudioEncoder.AAC_ELD, OutputFormat.AAC_ADTS, ".aac", "AAC_ELD|AAC_ADTS|aac"),
+        CodecFormat(AudioEncoder.AAC, OutputFormat.MPEG_4, ".aac", "AAC|MPEG_4|aac"),
+        CodecFormat(AudioEncoder.AAC_ELD, OutputFormat.MPEG_4, ".aac", "AAC_ELD|MPEG_4|aac")
 
         // .mpa
         // CodecFormat(AudioEncoder.AAC, OutputFormat.AAC_ADTS, ".m4a", "AAC|AAC_ADTS|m4a"),
@@ -58,14 +58,14 @@ class MainActivity : AppCompatActivity(),
         // CodecFormat(AudioEncoder.AAC_ELD, OutputFormat.AAC_ADTS, ".m4a", "AAC_ELD|AAC_ADTS|m4a"),
 
         // .mp4
-        CodecFormat(AudioEncoder.AAC_ELD, OutputFormat.AAC_ADTS, ".mp4", "AAC_ELD|AAC_ADTS|mp4"),
+        // CodecFormat(AudioEncoder.AAC_ELD, OutputFormat.AAC_ADTS, ".mp4", "AAC_ELD|AAC_ADTS|mp4"),
 
         // mp3
-        CodecFormat(AudioEncoder.AAC, OutputFormat.MPEG_4, ".mp3", "AAC|MPEG_4|mp3"),
+        // CodecFormat(AudioEncoder.AAC, OutputFormat.MPEG_4, ".mp3", "AAC|MPEG_4|mp3"),
 
         // OPUS .ogg/.webm
-        CodecFormat(AudioEncoder.OPUS, OutputFormat.OGG, ".ogg", "OPUS|OGG|ogg"),
-        CodecFormat(AudioEncoder.OPUS, OutputFormat.WEBM, ".webm", "OPUS|WEBM|webm")
+        // CodecFormat(AudioEncoder.OPUS, OutputFormat.OGG, ".ogg", "OPUS|OGG|ogg"),
+        // CodecFormat(AudioEncoder.OPUS, OutputFormat.WEBM, ".webm", "OPUS|WEBM|webm")
         // CodecFormat(AudioEncoder.VORBIS, OutputFormat.OGG, ".ogg", "VORBIS|OGG|ogg"),
         // CodecFormat(AudioEncoder.VORBIS, OutputFormat.WEBM, ".webm", "VORBIS|WEBM|webm")
     )
@@ -127,9 +127,9 @@ class MainActivity : AppCompatActivity(),
         timer.base = SystemClock.elapsedRealtime()
         timer.start()
 
-        val formatter = SimpleDateFormat("ddHHmmss", Locale.FRANCE)
+        val formatter = SimpleDateFormat("yyyyMMddHHmmss", Locale.FRANCE)
         val recordFile =
-            "${formatter.format(Date())}-${bitrateValue}-" +
+            "${formatter.format(Date())}-" +
                 "${codecFormatSelected.toString}${codecFormatSelected.extension}"
 
         mediaRecorder = MediaRecorder()
@@ -138,7 +138,8 @@ class MainActivity : AppCompatActivity(),
             this.setOutputFormat(codecFormatSelected.outputFormat)
             this.setOutputFile("$path/$recordFile")
             this.setAudioEncoder(codecFormatSelected.codec)
-            // this.setAudioEncodingBitRate(bitrateValue)
+            this.setAudioSamplingRate(44100)
+            this.setAudioEncodingBitRate(16000)
 
             try {
                 this.prepare()
@@ -167,9 +168,6 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun setSpinners() {
-        val bitrateSelection = this.resources.getStringArray(R.array.bitrate_select)
-        bitrate_selector.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, bitrateSelection)
-
         val codecFormatStrings: ArrayList<String> = arrayListOf()
         for (codecFormat in codecFormatList)
             codecFormatStrings.add(codecFormat.toString())
@@ -178,16 +176,6 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun initSpinnersListener() {
-        bitrate_selector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                bitrateValue = resources.getStringArray(R.array.bitrate_select)[position].toInt()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                bitrateValue = resources.getStringArray(R.array.bitrate_select)[0].toInt()
-            }
-        }
-
         codecformat_selector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 codecFormatSelected = codecFormatList[position]
