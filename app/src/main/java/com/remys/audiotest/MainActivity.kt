@@ -49,8 +49,8 @@ class MainActivity : AppCompatActivity(),
         // CodecFormat(AudioEncoder.AAC, OutputFormat.AAC_ADTS, ".aac", "AAC|AAC_ADTS|aac"),
         // CodecFormat(AudioEncoder.HE_AAC, OutputFormat.AAC_ADTS, ".aac", "HE_AAC|AAC_ADTS|aac"),
         // CodecFormat(AudioEncoder.AAC_ELD, OutputFormat.AAC_ADTS, ".aac", "AAC_ELD|AAC_ADTS|aac"),
-        CodecFormat(AudioEncoder.AAC, OutputFormat.MPEG_4, "aac", "AAC-MPEG_4-aac")
-        // CodecFormat(AudioEncoder.AAC_ELD, OutputFormat.MPEG_4, "aac", "AAC_ELD-MPEG_4-aac")
+        CodecFormat(AudioEncoder.AAC, OutputFormat.MPEG_4, "aac", "AAC-MPEG_4-aac"),
+        CodecFormat(AudioEncoder.AAC_ELD, OutputFormat.MPEG_4, "aac", "AAC_ELD-MPEG_4-aac")
 
         // .mpa
         // CodecFormat(AudioEncoder.AAC, OutputFormat.AAC_ADTS, ".m4a", "AAC|AAC_ADTS|m4a"),
@@ -138,8 +138,8 @@ class MainActivity : AppCompatActivity(),
             this.setOutputFile("$path/$recordFile")
             this.setAudioEncoder(codecFormatSelected.codec)
             this.setAudioSamplingRate(44100)
-            // this.setAudioEncodingBitRate(16000)
-            // this.setAudioChannels(1)
+            this.setAudioEncodingBitRate(96000)
+            this.setAudioChannels(2)
 
             try {
                 this.prepare()
